@@ -1,0 +1,32 @@
+#person:
+#  lastName: lihong
+#  age: 22
+#  boss: true
+#  birth: 2000/1/1
+#  maps: { k1: v1,k2: v2 }
+#  list:
+#    - pig
+#    - dog
+#    - cat
+#  dog:
+#    name: 小福
+#    age: 2
+#其中三个连续短横线分割成三个文档
+
+server:
+  port: 8080
+spring:
+  profiles:
+    active: dev
+---
+server:
+  port: 8081
+spring:
+  profiles: dev
+
+---
+server:
+  port: 8082
+spring:
+  profiles: prod
+

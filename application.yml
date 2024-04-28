@@ -1,0 +1,5 @@
+#server:
+#  port: 8084
+#配置项目的访问路径
+#  servlet:
+#    context-path: /boot02
