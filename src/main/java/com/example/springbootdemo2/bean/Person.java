@@ -207,6 +207,31 @@ import java.util.Map;
  * 在运行打包文件时，使用命令参数 --spring.config.location
  * java -jar springboot-demo1-0.0.1-SNAPSHOT.jar --spring.config.location=D:/application.properties
  *
+ * 八、外部配置加载顺序---5+4+2
+ * Spring Boot还可以从以下位置，加载配置文件；优先级从高到低，高优先级会覆盖低优先级，若有不同配置，不同级别配置文件会形成互补配置
+ *
+ * 1.命令行参数
+ * E:\java-pro\springboot-demo2\target>java -jar springboot-demo1-0.0.1-SNAPSHOT.jar --server.port=8087 --server.servlet.context-path=/boot
+ * 命令如果过多，在命令行书写不方便，可以采用6或者8，在打包好的jar包同级目录中，写一个application.properties或者application.yml
+ *
+ *
+ * 2.来自java:comp/env的NDI属性
+ * 3.java系统属性（System.getProperties()）
+ * 4.操作系统环境变量
+ * 5.RandomValuePropertySource配置的random.*属性值
+ *
+ * 记忆：优先加载带profile的配置文件，都是jar包外部的优先于jar包内部的
+ * 6.jar包外部的application-{profile}.properties或者application.yml(spring.profile)配置文件
+ * 7.jar包内部的application-{profile}.properties或者application.yml(spring.profile)配置文件
+ * 8.jar包外部的application.properties或者application.yml(不带spring.profile)配置文件
+ * 9.jar包内部的application.properties或者application.yml(不带spring.profile)配置文件
+ *
+ * 10.@ConfigurationProperty注解类上的@PropertySource
+ * 11.通过SpringApplication.setDefaultProperties指定的默认属性
+ *
+ * 九、Spring配置-自动配置原理
+ * 
+ *
  *
  *
  *
