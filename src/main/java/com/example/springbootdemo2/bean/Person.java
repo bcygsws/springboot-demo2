@@ -230,7 +230,93 @@ import java.util.Map;
  * 11.通过SpringApplication.setDefaultProperties指定的默认属性
  *
  * 九、Spring配置-自动配置原理
- * 
+ * 配置文件到底怎么写？到底写什么内容？自动配置原理
+ * 参考spring boot官网
+ * 文档：https://docs.spring.io/spring-boot/docs/2.7.18/reference/htmlsingle/#appendix.application-properties
+ *
+ * 自动配置原理：
+ * 1.spring boot启动，加载主配置类，开启了自动配置功能@EnableAutoConfiguration
+ * 2.注解@EnableAutoConfiguration的作用
+ * 2.1 利用AutoConfigurationImportSelector，给容器导入一些组件？
+ * @EnableAutoConfiguration---AutoConfigurationImportSelector.class---selectImports()---getAutoConfigurationEntry()
+ * ---this.getCandidateConfigurations(annotationMetadata, attributes)---getCandidateConfigurations()
+ * ---SpringFactoriesLoader.loadFactoryNames()---打开loadFactoryNames()方法
+ *
+ * 可以查看selectImports()方法中的内容，就可以知道自动添加了哪些配置？
+ * 再进入到getAutoConfigurationEntry()这个方法，看到一个String类型的List定义的一个configurations
+ * List<String> configurations = this.getCandidateConfigurations(annotationMetadata, attributes);
+ *
+ * a.SpringFactoriesLoader.loadFactoryNames()
+ * b.扫描所有jar包类路径下 META-INF/spring.factories的jar包，然后返回需要导入的组件的全类名
+ * 路径：E:\devsoft\maven-repository\org\springframework\boot\spring-boot-autoconfigure\2.7.6\spring-boot-autoconfigure-2.7.6.jar!\org\springframework\boot\autoconfigure\AutoConfigurationImportSelector.class
+ * 当前行打断点，监视： configurations = this.getConfigurationClassFilter().filter(configurations);
+ *
+ * 结果：看到configuration= {是一个size=148的ArrayList}
+ * 【这里都是项目启动时自动配置的类】，特别注意：
+ * 参考文档：https://blog.csdn.net/cys0817/article/details/135784072
+ * spring boot 2.7.0版本之前，这些类放在 META-INF/spring.factories文件中
+ * 但是，从spring boot 2.7.1开始，这些包含类名的文件放在 META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports文件中了
+ *
+ *
+ * c.把扫描到的这些文件的内容包装成properties对象
+ * Properties properties = PropertiesLoaderUtils.loadProperties(resource)
+ *
+ * d.从properties中获取EnableAutoConfiguration.calss类（类名）对应的值，然后把他们添加到容器中
+ * 下列代码文件绝对路径：
+ * E:\devsoft\maven-repository\org\springframework\boot\spring-boot-autoconfigure\2.7.6\spring-boot-autoconfigure-2.7.6.jar!\org\springframework\boot\autoconfigure\AutoConfigurationImportSelector.class
+ *
+ * protected Class<?> getSpringFactoriesLoaderFactoryClass() {
+ * return EnableAutoConfiguration.class;
+ *  }
+ *
+ * e.把类路径下的META-INF/spring.factories里面配置的所有EnableAutoConfiguration的值加入到容器中
+ * f.每一个这样的类都是容器中的一个组件，用它们来自动配置
+ *
+ * 截取size 148的List中的一个类（HttpEncodingAutoConfiguration,作用：Http编码）自动配置为例说明自动配置原理；
+ * 参考文档：https://blog.csdn.net/cys0817/article/details/135784072
+ *
+ *
+ * @AutoConfiguration  // 一个配置类，跟之前的配置文件一样，用于为容器添加组件
+ * @EnableConfigurationProperties({ServerProperties.class})// 启动指定类的
+ * // 其中，@ConfigurationProperties将配置文件中的值和当前类HttpEncodingAutoConfiguration绑定在一起并加入到容器中
+ *
+ * @ConditionalOnWebApplication(// spring的底层注解@Conditional,用于判断是否满足条件，满足这个条键，配置类的配置就会生效
+ * // @ConditionalOnWebApplication用于判断当前应用是否是web应用程序，如果是当前配置生效
+ *  type = Type.SERVLET
+ * )
+ * @ConditionalOnClass({CharacterEncodingFilter.class}) // @ConditionalOnClass,判断当前项目是否有这个类
+ * // CharacterEncodingFilter 是Spring MVC解决是否乱码的过滤器
+ * @ConditionalOnProperty( // 判断配置文件中是否存在某个配置（prefix=server.servlet.encoding）
+ *  prefix = "server.servlet.encoding",
+ *  value = {"enabled"},
+ * matchIfMissing = true)// 即使配置文件中不配置enabled,返回true,配置类也依然生效
+ * public class HttpEncodingAutoConfiguration {
+ *
+ * g.以上，都是在判断当前配置类是否生效?
+ * 一旦配置类生效，这个配置类就会给容器添加各种组件就会生效
+ * 这些组件对应的属性都是从properties类中获取的，这些类里的每一个属性又是和配置文件绑定的
+ *
+ *  @Bean // 给容器中添加一个组件，组件默认将方法名作为id
+ * @ConditionalOnMissingBean
+ *  public CharacterEncodingFilter characterEncodingFilter() {
+ * CharacterEncodingFilter filter = new OrderedCharacterEncodingFilter();
+ * filter.setEncoding(this.properties.getCharset().name());
+ * filter.setForceRequestEncoding(this.properties.shouldForce(org.springframework.boot.web.servlet.server.Encoding.Type.REQUEST));
+ * filter.setForceResponseEncoding(this.properties.shouldForce(org.springframework.boot.web.servlet.server.Encoding.Type.RESPONSE));
+ * return filter;}
+ *
+ * 总结：
+ * spring boot的精髓：
+ * 1.spring boot启动会加载大量自动配置类
+ * 2.我们需要某个功能，看spring boot是否有写好的配置类
+ * 3.我们再看配置类中到底配置了哪些组件（如果已经配好组件，我们就不需要写了；如果没有，需要自己写）
+ * 4.给容器中自动配置类添加组件的时候，会从properties类中获取某些属性，而我们可以在配置文件中配置这些属性
+ *
+ *
+ *
+ *
+ *
+ *
  *
  *
  *
