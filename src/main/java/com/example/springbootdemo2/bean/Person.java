@@ -305,8 +305,7 @@ import java.util.Map;
  * filter.setForceResponseEncoding(this.properties.shouldForce(org.springframework.boot.web.servlet.server.Encoding.Type.RESPONSE));
  * return filter;}
  *
- * 总结：
- * spring boot的精髓：
+ * 总结-spring boot的精髓
  * 1.spring boot启动会加载大量自动配置类
  * 2.我们需要某个功能，看spring boot是否有写好的配置类
  * 3.我们再看配置类中到底配置了哪些组件（如果已经配好组件，我们就不需要写了；如果没有，需要自己写）
