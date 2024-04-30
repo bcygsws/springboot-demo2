@@ -240,7 +240,9 @@ import java.util.Map;
  * 2.1 利用AutoConfigurationImportSelector，给容器导入一些组件？
  * @EnableAutoConfiguration---AutoConfigurationImportSelector.class---selectImports()---getAutoConfigurationEntry()
  * ---this.getCandidateConfigurations(annotationMetadata, attributes)---getCandidateConfigurations()
- * ---SpringFactoriesLoader.loadFactoryNames()---打开loadFactoryNames()方法
+ * ---SpringFactoriesLoader.loadFactoryNames()---loadSpringFactories()
+ * 在loadSpringFactories()方法里有语句，从MEAT/INF的spring.properties中获取类型
+ * Enumeration<URL> urls = classLoader.getResources("META-INF/spring.factories");
  *
  * 可以查看selectImports()方法中的内容，就可以知道自动添加了哪些配置？
  * 再进入到getAutoConfigurationEntry()这个方法，看到一个String类型的List定义的一个configurations
@@ -255,7 +257,8 @@ import java.util.Map;
  * 【这里都是项目启动时自动配置的类】，特别注意：
  * 参考文档：https://blog.csdn.net/cys0817/article/details/135784072
  * spring boot 2.7.0版本之前，这些类放在 META-INF/spring.factories文件中
- * 但是，从spring boot 2.7.1开始，这些包含类名的文件放在 META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports文件中了
+ * 但是，从spring boot 2.7.1开始，这些包含类名的文件放在
+ * META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports文件中了
  *
  *
  * c.把扫描到的这些文件的内容包装成properties对象
@@ -310,6 +313,12 @@ import java.util.Map;
  * 2.我们需要某个功能，看spring boot是否有写好的配置类
  * 3.我们再看配置类中到底配置了哪些组件（如果已经配好组件，我们就不需要写了；如果没有，需要自己写）
  * 4.给容器中自动配置类添加组件的时候，会从properties类中获取某些属性，而我们可以在配置文件中配置这些属性
+ *
+ * 【spring boot】自动装配原理
+ * 参考文档：
+ * https://blog.csdn.net/weixin_45481821/article/details/129703973
+ *
+ *
  *
  *
  *
