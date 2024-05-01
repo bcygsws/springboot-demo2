@@ -317,6 +317,9 @@ import java.util.Map;
  * 【spring boot】自动装配原理
  * 参考文档：
  * https://blog.csdn.net/weixin_45481821/article/details/129703973
+ * 自动装配是什么及其作用：
+ * 简单说，就是从META-INF/spring.properties文件获取需要自动装配的类，并生成bean对象，然后交给
+ * spring boot容器来管理的过程
  *
  *
  *
