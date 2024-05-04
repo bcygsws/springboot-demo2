@@ -321,6 +321,64 @@ import java.util.Map;
  * 简单说，就是从META-INF/spring.properties文件获取需要自动装配的类，并生成bean对象，然后交给
  * spring boot容器来管理的过程
  *
+ * 12.@Conditional的派生注解（Spring注解版原生的@Canditional的作用）
+ * 作用：必须是@Conditional指定的条件成立，才给容器中添加组件，配置里的所有内容才会生效
+ * spring boot中@Conditional注解实例
+ * 参考文档：https://blog.csdn.net/ZGL_cyy/article/details/132866627
+ *
+ *  @Conditional扩展注解                  作用（是否满足当前@Conditional指定条件）
+ * @ConditonalOnJava                  系统的java版本是否符合要求
+ * @ConditonalOnBean                  容器中存在指定的Bean
+ * @ConditonalOnMissingBean           容器中不存在指定的Bean
+ * @ConditonalOnExpression            满足SpEL表达式指定
+ * @ConditonalOnClass                 系统中有指定的类
+ * @ConditonalOnMissingClass          系统中没有指定的类
+ * @ConditonalOnSingleCandidate       容器中只有一个指定的Bean，或者这个Bean是首选的Bean
+ * @ConditonalOnProperty              系统中的属性是否有指定的值
+ * @ConditonalOnResource              类路径下是否存在指定的资源文件
+ * @ConditionalOnWebApplication         当前是web环境
+ * @ConditionalOnNotWebApplication      当前不是web环境
+ * @ConditionalOnJndi                 JNDI存在指定项
+ *
+ * 自动配置类必须在一定条件下才能生效
+ * 那么，如何识别当前项目哪些自动配置类生效了呢？
+ * 解决：弃用debug属性
+ * debug=true
+ * 在配置文件（.properties)配置上述命令，就可以在项目运行时，在控制台打印自动配置报告
+ *
+ * 九、spring boot日志
+ * 市面上最常用的日志框架
+ * JUL
+ * JCL
+ * jboss-logging
+ * logback
+ * log4j
+ * log4j2
+ * slf4j2
+ *
+ * 日志的门面（日志的抽象层）                                                                日志实现
+ * 1. JCL(全称：Jakata Commons Logging) 2. SLF4j(全称：Simple Logging Facade for Java)        Log4j JUL(java.util.logging,java工具自带的)
+ * 3. Jboss-logging                                                                            Log4j2（阿帕奇公司借助log4j之名设计的） Logback（）
+ *
+ * 左边选择一个抽象层，右边选择一个实现
+ * a.抽象层选择
+ * Jboss-logging 用的场景太少
+ * JCL最后一次更新，2014n年
+ * 抽象层，就有SLF4j
+ *
+ * b.日志实现
+ * Log4j logback 和slf4j都是出自同一个人之手
+ *
+ * spring boot底层是spring 框架，spring框架默认是使用JCL
+ *  Spring Boot也选择的是slf4j+logback
+ *
+ * 
+ *
+ *
+ *
+ *
+ *
+ *
  *
  *
  *
