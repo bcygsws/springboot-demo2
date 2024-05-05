@@ -363,7 +363,7 @@ import java.util.Map;
  * 左边选择一个抽象层，右边选择一个实现
  * a.抽象层选择
  * Jboss-logging 用的场景太少
- * JCL最后一次更新，2014n年
+ * JCL最后一次更新，2014年
  * 抽象层，就有SLF4j
  *
  * b.日志实现
@@ -372,7 +372,41 @@ import java.util.Map;
  * spring boot底层是spring 框架，spring框架默认是使用JCL
  *  Spring Boot也选择的是slf4j+logback
  *
- * 
+ * 9.1 如何使用slf4j?
+ * 以后开发的时候，日常记录方法的调用，不应该直接调用日志的实现类，而是要调用日志抽象层里面的方法
+ * import org.slf4j.Logger;
+ * import org.slf4j.LoggerFactory;
+ * public class HelloWorld {public static void main(String[] args) {
+ *  Logger logger = LoggerFactory.getLogger(HelloWorld.class);
+ * logger.info("Hello World");
+ *   }
+ * }
+ *
+ * 9.2 上面是抽象层的代码，表示可以使用slf4j了，还需要具体的实现来接收日志信息
+ * 此时，配置要参照根路径下 /spring boot logging.jpg
+ *
+ * 注：每一个日志实现的框架都有自己的配置文件，使用slf4j以后，配置文件还是 做成 日志实现框架本身的配置文件
+ * 9.3 【遗留问题】根据上面注的思路
+ * spring框架（自己使用的是commons-logging）
+ * hibernate框架（自己使用的是jboss-logging）
+ * MyBatis框架
+ * ……
+ *
+ * 那么，slf4j能否对不同框架做统一处理呢？
+ * 面对不同的框架统一管理，参照根路径下 图 /spring boot universe management.jpg
+ * 1.将系统中其他框架的日志包移除
+ * 2.用中间包来替换原有的日志框架（适配层，可能不需要）
+ * 3.添加重新包装的包（参考图片spring boot universe management.jpg）来取代框架的日志包
+ *
+ * 项目实践：spring 默认使用commons-logging做日志管理（相关包名是commons-logging.jar）,我们要做的是先移除commons-logging.jar包，然后导入
+ * 重新包装的jar包-jcl-over-slf4j.jar
+ *
+ *
+ *
+ *
+ *
+ *
+ *
  *
  *
  *
